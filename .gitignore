@@ -1,0 +1,177 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# PYTHON
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+.ENV/
+.env/
+
+# ═══════════════════════════════════════════════════════════════════════════
+# PROJECT SPECIFIC
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Data directories (processed data, but keep structure)
+data/processed/*
+data/embeddings/*
+!data/processed/.gitkeep
+!data/embeddings/.gitkeep
+
+# Vector databases
+*.db
+*.sqlite
+*.sqlite3
+chroma_db/
+pinecone_cache/
+weaviate_data/
+
+# Model files
+*.bin
+*.pt
+*.pth
+*.onnx
+*.pkl
+*.joblib
+*.h5
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ENVIRONMENT & SECRETS
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.*.local
+
+# API keys and secrets
+*_key.txt
+*_secret.txt
+credentials.json
+service-account.json
+
+# ═══════════════════════════════════════════════════════════════════════════
+# IDE & EDITOR
+# ═══════════════════════════════════════════════════════════════════════════
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TESTING & COVERAGE
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LOGS & TEMPORARY FILES
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Logs
+logs/
+*.log
+*.log.*
+log.txt
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+
+# ═══════════════════════════════════════════════════════════════════════════
+# OS SPECIFIC
+# ═══════════════════════════════════════════════════════════════════════════
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DOCUMENTATION BUILD
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Sphinx
+docs/_build/
+docs/.doctrees/
+
+# MkDocs
+site/
+
+# ═══════════════════════════════════════════════════════════════════════════
+# KEEP THESE FILES/FOLDERS
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Keep directory structure
+!.gitkeep
+!*/
+!README.md
+
+# Keep important configs
+!.pre-commit-config.yaml
+!requirements.txt
+!pyproject.toml
+!setup.py
