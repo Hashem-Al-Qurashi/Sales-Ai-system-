@@ -3,9 +3,11 @@ Hierarchical chunking system with framework preservation.
 
 This module implements intelligent chunking that maintains the integrity
 of Alex Hormozi's frameworks while creating optimal chunks for retrieval.
+Enhanced with cohesion detection and validation.
 """
 
 import re
+import time
 from typing import List, Dict, Optional, Tuple, Any
 from dataclasses import dataclass, field
 from enum import Enum
@@ -15,6 +17,8 @@ from datetime import datetime
 from ..config.settings import settings
 from ..core.logger import get_logger
 from ..extractors.pdf_extractor import ExtractedPage, FrameworkBoundary
+from .cohesion_detector import CohesionDetector, AtomicUnit, AtomicType, ProtectedRegion
+from .cohesion_validator import CohesionValidator, CohesiveChunk, CohesionReport
 
 logger = get_logger(__name__)
 
@@ -125,13 +129,18 @@ class Chunk:
 
 
 class HierarchicalChunker:
-    """Implements hierarchical chunking with framework preservation."""
+    """Implements hierarchical chunking with framework preservation and cohesion detection."""
     
     def __init__(self):
-        """Initialize the chunker."""
+        """Initialize the chunker with cohesion components."""
         self.chunks: List[Chunk] = []
         self.framework_chunks: Dict[str, List[Chunk]] = {}
         self.hierarchy_map: Dict[str, List[str]] = {}
+        
+        # Cohesion system components
+        self.cohesion_detector = CohesionDetector()
+        self.cohesion_validator = CohesionValidator()
+        self.enable_cohesion = getattr(settings.cohesion, 'enable_cohesion_detection', True)
     
     def chunk_documents(self, 
                        extracted_pages: List[ExtractedPage],
@@ -810,3 +819,347 @@ class HierarchicalChunker:
             "content_type_distribution": content_type_counts,
             "frameworks_preserved": list(self.framework_chunks.keys())
         }
+    
+    def chunk_with_cohesion(self, text: str, source_file: str = "unknown") -> List[CohesiveChunk]:
+        """Enhanced chunking method with cohesion preservation.
+        
+        This method integrates cohesion detection and validation to ensure
+        that business frameworks, lists, and sequences stay together.
+        
+        Args:
+            text: Input text to chunk
+            source_file: Source file name for metadata
+            
+        Returns:
+            List of cohesive chunks with preserved content integrity
+        """
+        start_time = time.time()
+        
+        # Level 1: Input validation (fail fast)
+        if not text or not isinstance(text, str):
+            raise ValueError("Text must be non-empty string")
+        if len(text) < 50:
+            raise ValueError("Text too short for meaningful chunking")
+        
+        try:
+            # Level 2: Business logic with cohesion preservation
+            if self.enable_cohesion:
+                logger.info("Starting cohesion-aware chunking")
+                
+                # Step 1: Detect atomic units that cannot be split
+                atomic_units = self.cohesion_detector.detect_atomic_units(text)
+                logger.info(f"Detected {len(atomic_units)} atomic units")
+                
+                # Step 2: Create protected regions
+                protected_regions = self._create_protected_regions(atomic_units)
+                
+                # Step 3: Chunk with protection
+                chunks = self._chunk_respecting_protection(text, protected_regions, source_file)
+                
+                # Step 4: Validate cohesion
+                validation_report = self.cohesion_validator.validate_chunks(chunks)
+                
+                if validation_report.has_critical_violations():
+                    logger.error(f"Critical cohesion violations detected: {len(validation_report.get_violations_by_severity('CRITICAL'))}")
+                    chunks = self.cohesion_validator.remediate_violations(chunks, validation_report)
+                
+                logger.info(f"Cohesion-aware chunking complete: {len(chunks)} chunks, "
+                           f"score {validation_report.cohesion_score:.3f}")
+                
+            else:
+                # Fallback to standard chunking
+                logger.info("Cohesion detection disabled, using standard chunking")
+                chunks = self._standard_chunk_text(text, source_file)
+                
+        except Exception as e:
+            # Level 3: System error handling - graceful degradation
+            logger.error(f"Cohesion chunking failed: {e}")
+            logger.info("Falling back to standard chunking")
+            chunks = self._standard_chunk_text(text, source_file)
+        
+        processing_time = time.time() - start_time
+        logger.info(f"Total chunking time: {processing_time:.2f}s")
+        
+        return chunks
+    
+    def _create_protected_regions(self, atomic_units: List[AtomicUnit]) -> List[ProtectedRegion]:
+        """Create protected regions from atomic units.
+        
+        Args:
+            atomic_units: List of detected atomic units
+            
+        Returns:
+            List of protected regions that cannot be split
+        """
+        if not atomic_units:
+            return []
+        
+        # Sort by priority and position
+        sorted_units = sorted(
+            atomic_units,
+            key=lambda u: (self._priority_score_numeric(u.priority), u.start_char)
+        )
+        
+        protected_regions = []
+        
+        for unit in sorted_units:
+            region = ProtectedRegion(
+                start=unit.start_char,
+                end=unit.end_char,
+                type=unit.type,
+                priority=unit.priority,
+                atomic_units=[unit],
+                reason=f"{unit.type.value}_{unit.framework_type or 'detected'}"
+            )
+            protected_regions.append(region)
+        
+        # Merge overlapping regions
+        return self._merge_overlapping_regions(protected_regions)
+    
+    def _chunk_respecting_protection(self, text: str, protected_regions: List[ProtectedRegion], source_file: str) -> List[CohesiveChunk]:
+        """Chunk text while respecting protected regions.
+        
+        Args:
+            text: Text to chunk
+            protected_regions: Regions that cannot be split
+            source_file: Source file name
+            
+        Returns:
+            List of cohesive chunks
+        """
+        chunks = []
+        current_pos = 0
+        
+        # Sort protected regions by start position
+        sorted_regions = sorted(protected_regions, key=lambda r: r.start)
+        
+        for region in sorted_regions:
+            # Chunk text before protected region
+            if current_pos < region.start:
+                pre_chunks = self._standard_chunk_segment(
+                    text[current_pos:region.start], 
+                    offset=current_pos,
+                    source_file=source_file
+                )
+                chunks.extend(pre_chunks)
+            
+            # Create atomic chunk for protected region
+            atomic_chunk = self._create_atomic_chunk(text, region, source_file)
+            chunks.append(atomic_chunk)
+            
+            current_pos = region.end
+        
+        # Chunk remaining text
+        if current_pos < len(text):
+            final_chunks = self._standard_chunk_segment(
+                text[current_pos:],
+                offset=current_pos,
+                source_file=source_file
+            )
+            chunks.extend(final_chunks)
+        
+        return chunks
+    
+    def _create_atomic_chunk(self, text: str, region: ProtectedRegion, source_file: str) -> CohesiveChunk:
+        """Create an atomic chunk from a protected region.
+        
+        Args:
+            text: Full text
+            region: Protected region
+            source_file: Source file name
+            
+        Returns:
+            Atomic cohesive chunk
+        """
+        chunk_text = text[region.start:region.end]
+        
+        # Generate chunk ID
+        chunk_id = self._generate_atomic_chunk_id(region, source_file)
+        
+        # Create metadata
+        metadata = {
+            "source_file": source_file,
+            "framework_complete": region.type == AtomicType.FRAMEWORK,
+            "atomic_preservation": True,
+            "preservation_method": region.reason,
+            "safe_to_retrieve_alone": True,
+            "region_type": region.type.value,
+            "priority": region.priority.value
+        }
+        
+        # Add framework-specific metadata
+        if region.atomic_units:
+            unit = region.atomic_units[0]
+            if unit.framework_type:
+                metadata["framework_type"] = unit.framework_type
+                metadata["related_frameworks"] = self._get_related_concepts(unit.framework_type)
+        
+        return CohesiveChunk(
+            chunk_id=chunk_id,
+            text=chunk_text,
+            start_char=region.start,
+            end_char=region.end,
+            chunk_type="atomic",
+            atomic_units=region.atomic_units,
+            cohesion_score=1.0,  # Perfect cohesion for atomic units
+            metadata=metadata
+        )
+    
+    def _standard_chunk_segment(self, text: str, offset: int, source_file: str) -> List[CohesiveChunk]:
+        """Apply standard chunking to a text segment.
+        
+        Args:
+            text: Text segment to chunk
+            offset: Character offset in original text
+            source_file: Source file name
+            
+        Returns:
+            List of standard cohesive chunks
+        """
+        chunks = []
+        chunk_size = settings.chunking.default_chunk_size
+        overlap = settings.chunking.chunk_overlap
+        
+        current_pos = 0
+        chunk_index = 0
+        
+        while current_pos < len(text):
+            end_pos = min(current_pos + chunk_size, len(text))
+            
+            # Find good break point (sentence or paragraph boundary)
+            if end_pos < len(text):
+                end_pos = self._find_good_break_point(text, current_pos, end_pos)
+            
+            chunk_text = text[current_pos:end_pos]
+            
+            if len(chunk_text.strip()) > 50:  # Only create non-trivial chunks
+                chunk_id = f"{source_file}_std_{chunk_index:03d}"
+                
+                chunk = CohesiveChunk(
+                    chunk_id=chunk_id,
+                    text=chunk_text,
+                    start_char=offset + current_pos,
+                    end_char=offset + end_pos,
+                    chunk_type="standard",
+                    atomic_units=[],
+                    cohesion_score=0.7,  # Default score for standard chunks
+                    metadata={
+                        "source_file": source_file,
+                        "chunk_method": "standard_segmentation",
+                        "atomic_preservation": False
+                    }
+                )
+                chunks.append(chunk)
+                chunk_index += 1
+            
+            # Move to next position with overlap
+            current_pos = max(current_pos + 1, end_pos - overlap)
+        
+        return chunks
+    
+    def _standard_chunk_text(self, text: str, source_file: str) -> List[CohesiveChunk]:
+        """Fallback standard chunking method.
+        
+        Args:
+            text: Text to chunk
+            source_file: Source file name
+            
+        Returns:
+            List of standard chunks
+        """
+        return self._standard_chunk_segment(text, 0, source_file)
+    
+    def _priority_score_numeric(self, priority) -> int:
+        """Convert priority to numeric score for sorting."""
+        priority_map = {
+            "CRITICAL": 3,
+            "HIGH": 2, 
+            "MEDIUM": 1,
+            "LOW": 0
+        }
+        priority_str = priority.value if hasattr(priority, 'value') else str(priority)
+        return priority_map.get(priority_str, 0)
+    
+    def _merge_overlapping_regions(self, regions: List[ProtectedRegion]) -> List[ProtectedRegion]:
+        """Merge overlapping protected regions.
+        
+        Args:
+            regions: List of protected regions
+            
+        Returns:
+            List of non-overlapping merged regions
+        """
+        if not regions:
+            return []
+        
+        # Sort by start position
+        sorted_regions = sorted(regions, key=lambda r: r.start)
+        merged = [sorted_regions[0]]
+        
+        for current in sorted_regions[1:]:
+            last_merged = merged[-1]
+            
+            # Check for overlap
+            if current.start <= last_merged.end:
+                # Merge regions
+                last_merged.end = max(last_merged.end, current.end)
+                last_merged.atomic_units.extend(current.atomic_units)
+                last_merged.reason += f", {current.reason}"
+            else:
+                merged.append(current)
+        
+        return merged
+    
+    def _generate_atomic_chunk_id(self, region: ProtectedRegion, source_file: str) -> str:
+        """Generate ID for atomic chunk.
+        
+        Args:
+            region: Protected region
+            source_file: Source file name
+            
+        Returns:
+            Unique chunk ID
+        """
+        # Extract base filename
+        base_name = source_file.replace('.pdf', '').replace(' ', '_').lower()
+        
+        # Generate type-specific ID
+        if region.type == AtomicType.FRAMEWORK and region.atomic_units:
+            fw_type = region.atomic_units[0].framework_type or "framework"
+            return f"{base_name}_{fw_type}_atomic"
+        elif region.type == AtomicType.NUMBERED_LIST:
+            return f"{base_name}_list_{region.start}_atomic"
+        elif region.type == AtomicType.SEQUENCE:
+            return f"{base_name}_seq_{region.start}_atomic"
+        else:
+            return f"{base_name}_{region.type.value}_{region.start}_atomic"
+    
+    def _find_good_break_point(self, text: str, start: int, end: int) -> int:
+        """Find a good break point for chunking.
+        
+        Args:
+            text: Text to search
+            start: Start position
+            end: Preferred end position
+            
+        Returns:
+            Optimal break point
+        """
+        # Look for sentence endings within reasonable distance
+        search_start = max(start, end - 200)  # Don't go too far back
+        
+        # Look for sentence endings
+        for pos in range(end, search_start, -1):
+            if pos < len(text) and text[pos] in '.!?':
+                # Make sure it's not an abbreviation
+                if pos + 1 < len(text) and text[pos + 1] in ' \n':
+                    return pos + 1
+        
+        # Look for paragraph breaks
+        for pos in range(end, search_start, -1):
+            if pos < len(text) and text[pos] == '\n':
+                if pos + 1 < len(text) and text[pos + 1] == '\n':
+                    return pos + 1
+        
+        # Fallback to original end
+        return end

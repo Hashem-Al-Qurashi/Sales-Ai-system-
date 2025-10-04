@@ -321,6 +321,30 @@ class ValidationConfig:
 
 
 @dataclass
+class CohesionConfig:
+    """Configuration for cohesion preservation system."""
+    
+    # Main settings
+    enable_cohesion_detection: bool = True
+    framework_detection_confidence: float = 0.8
+    list_min_items: int = 2
+    sequence_min_steps: int = 2
+    max_atomic_chunk_size: int = 4000  # chars
+    validation_strictness: str = "high"  # "low", "medium", "high"
+    
+    # Performance settings
+    enable_pattern_caching: bool = True
+    batch_size_for_large_docs: int = 50000
+    max_processing_time_seconds: int = 300
+    
+    # Quality thresholds
+    min_cohesion_score: float = 0.5
+    min_framework_integrity: float = 0.95
+    min_list_completeness: float = 0.90
+    min_example_coherence: float = 0.85
+
+
+@dataclass
 class Settings:
     """Master configuration container."""
     
@@ -334,6 +358,7 @@ class Settings:
     api: APIConfig = field(default_factory=APIConfig)
     logging: LoggingConfig = field(default_factory=LoggingConfig)
     validation: ValidationConfig = field(default_factory=ValidationConfig)
+    cohesion: CohesionConfig = field(default_factory=CohesionConfig)
     
     # Environment
     environment: str = field(default_factory=lambda: os.getenv("ENVIRONMENT", "development"))
