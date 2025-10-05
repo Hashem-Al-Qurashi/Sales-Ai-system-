@@ -14,7 +14,7 @@ from structlog.processors import TimeStamper, add_log_level, format_exc_info
 from structlog.dev import ConsoleRenderer
 from structlog.processors import JSONRenderer
 
-from ..config.settings import settings
+from ..config.settings import settings, DATA_DIR
 
 
 class StructuredLogger:
@@ -129,7 +129,7 @@ def setup_logging():
     timestamper = TimeStamper(fmt="iso")
     
     # Choose renderer based on environment
-    if settings.environment == "production":
+    if settings.ENVIRONMENT == "production":
         renderer = JSONRenderer()
     else:
         renderer = ConsoleRenderer()
@@ -144,7 +144,7 @@ def setup_logging():
     # Add custom processors
     def add_environment(logger, method_name, event_dict):
         """Add environment to all log messages."""
-        event_dict["environment"] = settings.environment
+        event_dict["environment"] = settings.ENVIRONMENT
         return event_dict
     
     processors.append(add_environment)
@@ -162,13 +162,14 @@ def setup_logging():
     logging.basicConfig(
         format="%(message)s",
         stream=sys.stdout,
-        level=getattr(logging, settings.logging.log_level.upper()),
+        level=getattr(logging, settings.LOG_LEVEL.upper()),
     )
     
-    # Add file handler if configured
-    if settings.logging.log_file:
-        file_handler = logging.FileHandler(settings.logging.log_file)
-        file_handler.setLevel(getattr(logging, settings.logging.log_level.upper()))
+    # Add file handler if configured (simplified for new architecture)
+    log_file = DATA_DIR / "logs" / "hormozi_rag.log"
+    if log_file.parent.exists():
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setLevel(getattr(logging, settings.LOG_LEVEL.upper()))
         logging.getLogger().addHandler(file_handler)
     
     # Suppress noisy loggers
