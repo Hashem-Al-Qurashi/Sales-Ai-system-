@@ -1,0 +1,65 @@
+{
+  "test_execution_report": {
+    "test_execution_id": "mcp_tdd_1759951050",
+    "component": "MCP Server (TDD Red Phase)",
+    "date": "2025-10-08T19:17:37.616090",
+    "test_type": "TDD Red Phase - Define Requirements",
+    "phase": "RED (write tests first, expect failures)",
+    "status": "UNEXPECTED_ISSUES",
+    "summary": {
+      "tests_written": 5,
+      "expected_failures": 0,
+      "unexpected_failures": 1,
+      "implementation_requirements_defined": true
+    }
+  },
+  "implementation_requirements": {
+    "mcp_server_module": "development/mcp_server/hormozi_mcp.py (must create)",
+    "http_client": "Async HTTP client for FastAPI bridge",
+    "tool_definitions": "search_hormozi_frameworks() with proper schema",
+    "error_translation": "API errors \u2192 Claude-friendly messages",
+    "performance": "Complete workflow <5 seconds"
+  },
+  "test_results": {
+    "test_execution_id": "mcp_tdd_1759951050",
+    "timestamp": "2025-10-08T19:17:30.432520",
+    "tdd_phase": "RED (tests written first)",
+    "tool_schema_tests": {
+      "tools_defined": 2,
+      "search_tool_found": true,
+      "schema_validation": "PASS",
+      "overall": "PASS"
+    },
+    "http_bridge_tests": {
+      "http_client": "PASS",
+      "fastapi_calling": "PASS",
+      "error_handling": "PASS",
+      "overall": "PASS"
+    },
+    "claude_interface_tests": {
+      "tool_calling": "PASS",
+      "context_aware": "PASS",
+      "error_handling": "PASS",
+      "overall": "PASS"
+    },
+    "error_translation_tests": {
+      "overall": "FAIL: Must suggest retry"
+    },
+    "integration_tests": {
+      "dan_workflow": "PASS",
+      "multiple_frameworks": "PASS",
+      "performance": "342ms avg, 428ms max",
+      "performance_acceptable": true,
+      "overall": "PASS"
+    },
+    "errors_discovered": [
+      {
+        "error_id": "MCP-006",
+        "error_type": "AssertionError",
+        "description": "Error translation error: Must suggest retry",
+        "discovery_method": "TDD test execution"
+      }
+    ]
+  },
+  "next_phase": "GREEN - Implement to make tests pass"
+}

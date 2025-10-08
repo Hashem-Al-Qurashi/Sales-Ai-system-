@@ -13,10 +13,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+# Following ARCHITECTURE.md "Configuration Over Code" principle
+PROJECT_ROOT = Path(__file__).parent.parent.parent.parent  # Go up to main project root
+ENV_FILE = PROJECT_ROOT / "production" / "config" / ".env"
+load_dotenv(ENV_FILE)
 
 # Project paths
-PROJECT_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 
 
@@ -49,7 +51,14 @@ class Settings:
     CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "200"))
     
     # Vector Database
-    VECTOR_DB_TYPE = os.getenv("VECTOR_DB_TYPE", "chroma")
+    VECTOR_DB_TYPE = os.getenv("VECTOR_DB_TYPE", "postgresql")
+    
+    # PostgreSQL Configuration (per DECISION_LOG.md 2025-10-06 PostgreSQL + pgvector decision)
+    POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
+    POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
+    POSTGRES_DB = os.getenv("POSTGRES_DB", "hormozi_rag")
+    POSTGRES_USER = os.getenv("POSTGRES_USER", "rag_app_user")
+    POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "")
     
     # API Configuration
     API_HOST = os.getenv("API_HOST", "0.0.0.0")
@@ -76,9 +85,18 @@ class Settings:
         if cls.CHUNK_OVERLAP >= cls.CHUNK_SIZE:
             errors.append(f"CHUNK_OVERLAP ({cls.CHUNK_OVERLAP}) must be less than CHUNK_SIZE ({cls.CHUNK_SIZE})")
         
-        # Supported configurations
-        if cls.VECTOR_DB_TYPE not in ["chroma", "pinecone", "weaviate"]:
-            errors.append(f"VECTOR_DB_TYPE must be one of: chroma, pinecone, weaviate. Got: {cls.VECTOR_DB_TYPE}")
+        # Supported configurations per DECISION_LOG.md
+        if cls.VECTOR_DB_TYPE not in ["postgresql", "chroma", "pinecone", "weaviate"]:
+            errors.append(f"VECTOR_DB_TYPE must be one of: postgresql, chroma, pinecone, weaviate. Got: {cls.VECTOR_DB_TYPE}")
+        
+        # PostgreSQL-specific validation (per DATABASE_ENGINEERING_SPEC.md)
+        if cls.VECTOR_DB_TYPE == "postgresql":
+            if not cls.POSTGRES_PASSWORD:
+                errors.append("POSTGRES_PASSWORD environment variable is required for PostgreSQL")
+            if not cls.POSTGRES_HOST:
+                errors.append("POSTGRES_HOST environment variable is required for PostgreSQL")
+            if not cls.POSTGRES_DB:
+                errors.append("POSTGRES_DB environment variable is required for PostgreSQL")
         
         if errors:
             raise ValueError("Configuration validation failed:\n" + "\n".join(f"  - {error}" for error in errors))

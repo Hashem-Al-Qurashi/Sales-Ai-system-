@@ -274,9 +274,44 @@ Track decisions that intentionally create debt:
 
 | Date | Decision | Debt Created | Payback Plan | Due Date |
 |------|----------|--------------|--------------|----------|
-| 2025-10-06 | Use JSON files for MVP | No production DB | ✅ Migrate to PostgreSQL + pgvector | In Progress |
-| TBD | Skip authentication | No user management | Add auth layer | Before beta |
-| TBD | Hardcode prompts | No prompt versioning | Create prompt management | Month 2 |
+| 2025-10-06 | Use JSON files for MVP | No production DB | ✅ Migrate to PostgreSQL + pgvector | ✅ Completed |
+| 2025-10-08 | Skip authentication | No user management | Add auth layer | Before beta |
+| 2025-10-08 | Hardcode prompts | No prompt versioning | Create prompt management | Month 2 |
+
+---
+
+### 2025-10-08 - FastAPI Service Layer Implementation Decision  
+**Status**: Accepted  
+**Context**: Implement API service layer integrating with existing PostgreSQL + pgvector foundation following ARCHITECTURE.md principles and DATABASE_ENGINEERING_SPEC.md requirements.
+
+**Decision**: Implement FastAPI service following existing architectural interfaces and contracts
+
+**Key Requirements Identified**:
+1. Must implement VectorDBInterface for PostgreSQL operations
+2. Must follow 3-level error handling strategy per ARCHITECTURE.md
+3. Must meet DATABASE_ENGINEERING_SPEC.md performance targets (<500ms vector search)
+4. Must use singleton services pattern for database connections (max 20 pool)
+5. Must include hybrid search with configurable weighting (70% vector, 30% text)
+
+**Technical Constraints Discovered**:
+- Existing VectorDBInterface contract must be implemented (no direct DB access)
+- Connection pooling required (ARCHITECTURE.md singleton services)
+- Performance budget: <200ms database operations (allows 300ms API overhead)
+- Error fallback: Keyword search when vector search fails
+
+**Implementation Plan**:
+- Day 1: Create PostgreSQLVectorDB implementing VectorDBInterface  
+- Day 2: Extend existing FastAPI app with production endpoints
+- Day 3-4: MCP server with HTTP bridge to FastAPI
+- Day 5: End-to-end testing and performance validation
+
+**Performance Targets**:
+- Vector Search: <500ms p95 (per DATABASE_ENGINEERING_SPEC.md)
+- Hybrid Search: <1000ms p95  
+- Health Check: <50ms
+- Concurrent Users: 100+ supported (connection pool limit: 20)
+
+**Review Date**: 2025-10-15 (after API implementation and performance testing)
 
 ---
 

@@ -1,0 +1,44 @@
+{
+  "test_execution_report": {
+    "test_execution_id": "mcp_tdd_1759950442",
+    "component": "MCP Server (TDD Red Phase)",
+    "date": "2025-10-08T19:07:22.107771",
+    "test_type": "TDD Red Phase - Define Requirements",
+    "phase": "RED (write tests first, expect failures)",
+    "status": "EXPECTED_FAILURES",
+    "summary": {
+      "tests_written": 5,
+      "expected_failures": 1,
+      "unexpected_failures": 0,
+      "implementation_requirements_defined": true
+    }
+  },
+  "implementation_requirements": {
+    "mcp_server_module": "development/mcp_server/hormozi_mcp.py (must create)",
+    "http_client": "Async HTTP client for FastAPI bridge",
+    "tool_definitions": "search_hormozi_frameworks() with proper schema",
+    "error_translation": "API errors \u2192 Claude-friendly messages",
+    "performance": "Complete workflow <5 seconds"
+  },
+  "test_results": {
+    "test_execution_id": "mcp_tdd_1759950442",
+    "timestamp": "2025-10-08T19:07:22.107150",
+    "tdd_phase": "RED (tests written first)",
+    "tool_schema_tests": {},
+    "http_bridge_tests": {},
+    "claude_interface_tests": {},
+    "error_translation_tests": {},
+    "integration_tests": {},
+    "errors_discovered": [
+      {
+        "error_id": "MCP-001",
+        "error_type": "ImportError",
+        "description": "MCP server module does not exist yet",
+        "discovery_method": "TDD test execution",
+        "expected": true,
+        "tdd_phase": "RED"
+      }
+    ]
+  },
+  "next_phase": "GREEN - Implement to make tests pass"
+}

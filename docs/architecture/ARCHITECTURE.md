@@ -9,75 +9,304 @@ This document is the **single source of truth** for system architecture. Any cod
 3. **Fail Fast, Recover Gracefully**: Every operation can fail, plan for it
 4. **Configuration Over Code**: Behavior changes through config, not code changes
 
-## System Architecture
+## Three-Pillar System Architecture
+
+### **Architecture Overview: Local → API → MCP Evolution**
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     PUBLIC API LAYER                         │
-│  FastAPI (hormozi_rag/api/app.py)                           │
-│  - Endpoints: /query, /health, /metrics                     │
-│  - Rate Limiting, Auth, Request Validation                  │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────────────┐
-│                    ORCHESTRATOR LAYER                        │
-│  QueryOrchestrator (hormozi_rag/core/orchestrator.py)      │
-│  - Coordinates retrieval + generation                       │
-│  - Manages conversation context                             │
-│  - Handles retry logic and fallbacks                        │
-└──────────────┬─────────────────────┬────────────────────────┘
-               │                     │
-┌──────────────▼─────────┐  ┌───────▼───────────────────────┐
-│   RETRIEVAL ENGINE     │  │   GENERATION ENGINE           │
-│  VectorRetriever       │  │   LLM Integration             │
-│  - Semantic search     │  │   - Prompt engineering        │
-│  - Reranking           │  │   - Response formatting       │
-│  - Context window mgmt │  │   - Token management          │
-└──────────────┬─────────┘  └───────────────────────────────┘
-               │
-┌──────────────▼──────────────────────────────────────────────┐
-│                    STORAGE LAYER                             │
-│  ├── PostgreSQL + pgvector (Vector + Document unified)      │
-│  ├── Alternative: Chroma/Pinecone (Vector) + PostgreSQL     │
-│  └── Cache Layer (Redis/In-Memory)                          │
-└──────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        PILLAR 3: MCP SERVER LAYER                           │
+│  Claude Desktop Integration (future_mcp_server/)                            │
+│  - Tools: search_hormozi_frameworks(), analyze_offer_structure()            │
+│  - Protocol: Anthropic MCP standard                                        │
+│  - Integration: Direct Claude Desktop connection                            │
+└───────────────────────────────────┬─────────────────────────────────────────┘
+                                    │ HTTP calls
+┌───────────────────────────────────▼─────────────────────────────────────────┐
+│                        PILLAR 2: API SERVICE LAYER                          │
+│  FastAPI Production Server (production/api/)                                │
+│  - Endpoints: /query, /analyze-offer, /health, /metrics                     │
+│  - Features: Rate limiting, auth, validation, monitoring                    │
+│  - Purpose: HTTP interface for all external access                          │
+└───────────────────────────────────┬─────────────────────────────────────────┘
+                                    │ Native calls
+┌───────────────────────────────────▼─────────────────────────────────────────┐
+│                       PILLAR 1: DATA FOUNDATION                             │
+│  PostgreSQL + pgvector (IMPLEMENTED ✅)                                     │
+│  - Database: hormozi_rag with 20 chunks + embeddings                        │
+│  - Search: Native vector similarity + full-text                             │
+│  - Performance: Sub-millisecond queries                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Data Flow
+### **Current State vs Future State:**
 
-### 1. Document Processing Pipeline
+**✅ IMPLEMENTED (Pillar 1):**
+- PostgreSQL 14.19 + pgvector 0.5.1
+- 20 chunks with 3072-dimensional embeddings  
+- Native vector similarity search working
+- Production database with complete schema
+
+**🔧 NEXT (Pillar 2 - API Service Layer):**
+- FastAPI HTTP endpoints
+- Request validation and error handling
+- Production monitoring and logging
+- Claude Desktop → HTTP API bridge
+
+**🚀 FUTURE (Pillar 3 - MCP Integration):**
+- MCP server process for Claude Desktop
+- Tool definitions for framework search and analysis
+- Direct Claude integration without browser switching
+
+## Implementation Roadmap
+
+### **Phase 1: Data Foundation (✅ COMPLETED)**
 ```
-PDF Files → Extractor → Chunker → Embedder → VectorDB
-                ↓           ↓         ↓
-            Metadata    Statistics  Index
+✅ PostgreSQL + pgvector database operational
+✅ 20 chunks with real OpenAI embeddings  
+✅ Native vector similarity search working
+✅ Production-ready schema and data integrity
 ```
 
-**Contracts:**
-- Extractor Output: `{text: str, metadata: dict, page_map: dict}`
-- Chunker Output: `[{id: str, text: str, metadata: dict, embedding: None}]`
-- Embedder Output: `[{id: str, text: str, metadata: dict, embedding: float[]}]`
-
-### 2. Query Processing Pipeline
+### **Phase 2: API Service Layer (🔧 NEXT - 6-8 hours)**
 ```
-User Query → Validation → Embedding → Retrieval → Reranking → Generation → Response
-                 ↓            ↓           ↓           ↓           ↓
-              Logging     Cache Check  Metrics   Analytics   Monitoring
+FastAPI Server Development:
+├── Core Endpoints:
+│   ├── POST /query - Framework search endpoint
+│   ├── POST /analyze-offer - Offer analysis against frameworks  
+│   ├── GET /health - Service health monitoring
+│   └── GET /metrics - Performance and usage metrics
+│
+├── Production Features:
+│   ├── Request validation (prevent injection/malformed requests)
+│   ├── Error handling (graceful failures, no crashes)
+│   ├── Rate limiting (prevent abuse)
+│   ├── Logging (query tracking)  
+│   └── Monitoring (response times, success rates)
+│
+└── PostgreSQL Integration:
+    ├── Embedding generation via OpenAI
+    ├── Vector similarity queries  
+    ├── Result ranking and formatting
+    └── Structured JSON responses
 ```
 
-**Contracts:**
-- Query Input: `{query: str, filters: dict, limit: int, session_id: str}`
-- Retrieval Output: `[{chunk_id: str, text: str, score: float, metadata: dict}]`
-- Generation Input: `{query: str, context: list[str], history: list[dict]}`
-- Response: `{answer: str, sources: list, confidence: float, metadata: dict}`
+**Implementation Priority Order:**
+1. `/query` endpoint (core functionality)  
+2. `/health` endpoint (monitoring)
+3. Error handling and validation
+4. `/analyze-offer` endpoint (business logic)
+5. Rate limiting and production features
+
+### **Phase 3: MCP Server Integration (🚀 FUTURE - 4-6 hours)**
+```
+MCP Server for Claude Desktop:
+├── MCP Tools Exposed:
+│   ├── search_hormozi_frameworks(query: str) -> framework_results[]
+│   ├── analyze_offer_structure(offer: dict) -> analysis_report
+│   ├── get_framework_by_topic(topic: str) -> specific_framework
+│   └── compare_offer_strategies(offers: list) -> comparison_matrix
+│
+├── Claude Desktop Integration:
+│   ├── Direct tool calling (no browser needed)
+│   ├── Context preservation across queries
+│   ├── Automatic framework retrieval
+│   └── Real-time offer analysis feedback
+│
+└── Service Architecture:
+    ├── MCP Server Process (long-running Python process)
+    ├── HTTP calls to FastAPI endpoints  
+    ├── Error handling and timeouts
+    └── Usage logging and debugging
+```
+
+## Data Flow Evolution
+
+### **Current State (Pillar 1): Direct Database Access**
+```
+Local Scripts → PostgreSQL + pgvector → Results
+```
+
+### **Next State (Pillar 2): HTTP API Service**  
+```
+HTTP Request → FastAPI → QueryOrchestrator → PostgreSQL → Formatted Response
+                 ↓            ↓                 ↓             ↓
+              Validation   Embedding       Vector Search   JSON Response
+```
+
+### **Future State (Pillar 3): Claude Desktop Integration**
+```
+Claude Desktop → MCP Server → FastAPI → PostgreSQL → Claude Interface
+     ↓                ↓           ↓           ↓             ↓
+ Tool Calling    HTTP Bridge   Validation   Vector Search  Tool Response
+```
+
+## API Endpoint Specifications
+
+### **Core Endpoints (Pillar 2):**
+
+#### **POST /query**
+```json
+{
+  "input": {"query": "How do I increase perceived value?"},
+  "output": {
+    "answer": "Use the Value Equation framework...",
+    "sources": [
+      {
+        "chunk_id": "value_equation_complete_framework_010",
+        "framework": "the_value_equation", 
+        "relevance_score": 0.95,
+        "content_snippet": "Value = (Dream Outcome × Likelihood)..."
+      }
+    ],
+    "confidence": 0.92,
+    "query_time_ms": 45
+  }
+}
+```
+
+#### **POST /analyze-offer**
+```json
+{
+  "input": {
+    "offer": {
+      "price": "$2000",
+      "deliverables": ["Course", "Templates", "Support"],
+      "guarantee": "30-day money back"
+    }
+  },
+  "output": {
+    "analysis": {
+      "pricing_assessment": "Consider premium positioning per Chapter 5",
+      "value_equation_score": 7.2,
+      "enhancement_opportunities": [
+        "Add scarcity elements (Chapter 12)",
+        "Strengthen guarantee (Chapter 15)"
+      ],
+      "relevant_frameworks": ["premium_pricing", "guarantees", "scarcity"]
+    }
+  }
+}
+```
+
+### **MCP Tools (Pillar 3):**
+
+#### **Tool: search_hormozi_frameworks**
+```python
+def search_hormozi_frameworks(query: str) -> List[FrameworkResult]:
+    """
+    Find relevant Hormozi frameworks for any business question
+    
+    Args:
+        query: User's business question ("How do I price higher?")
+        
+    Returns:
+        List of framework chunks with relevance scores
+    """
+```
+
+#### **Tool: analyze_offer_structure** 
+```python
+def analyze_offer_structure(offer: OfferDetails) -> OfferAnalysis:
+    """
+    Analyze an offer against Hormozi principles
+    
+    Args:
+        offer: Structured offer details (price, deliverables, guarantee, etc.)
+        
+    Returns:
+        Framework-based analysis with improvement recommendations
+    """
+```
 
 ## Module Responsibilities
 
-### Core Modules
+### **Pillar 1: Data Foundation (PostgreSQL + pgvector) ✅**
 
-#### `hormozi_rag/core/orchestrator.py`
-- **Single Responsibility**: Coordinate retrieval and generation
-- **Dependencies**: Retriever, Generator, Cache
-- **State**: Stateless (context passed through)
+#### `PostgreSQL Database: hormozi_rag`
+- **Single Responsibility**: Store and retrieve framework data with vector similarity
+- **Implementation**: 6 tables per DATABASE_ENGINEERING_SPEC.md
+- **State**: Persistent, ACID compliant
+- **Performance**: <1ms queries, 20 chunks + embeddings operational
+
+### **Pillar 2: API Service Layer (FastAPI) 🔧**
+
+#### `production/api/app.py` (FastAPI Application)
+- **Single Responsibility**: HTTP interface for all external access
+- **Dependencies**: PostgreSQL, OpenAI, logging
+- **State**: Stateless HTTP service
+- **Endpoints**:
+  - `POST /query`: Framework search with semantic similarity
+  - `POST /analyze-offer`: Business offer analysis against frameworks
+  - `GET /health`: Service health and database connectivity
+  - `GET /metrics`: Performance monitoring and usage statistics
+
+#### `production/api/hormozi_rag/core/orchestrator.py`
+- **Single Responsibility**: Coordinate database queries and response formatting
+- **Dependencies**: PostgreSQL connector, OpenAI embedder  
+- **State**: Stateless (no session storage)
+- **Functions**:
+  - Query embedding generation
+  - Vector similarity search execution  
+  - Result ranking and confidence scoring
+  - Response formatting for API consumption
+
+#### `production/api/hormozi_rag/retrieval/retriever.py`
+- **Single Responsibility**: Execute PostgreSQL vector and text queries
+- **Dependencies**: psycopg2, pgvector operations
+- **State**: Connection pooling only
+- **Operations**:
+  - Vector similarity search using pgvector <-> operator
+  - Full-text search using PostgreSQL GIN indexes
+  - Hybrid search combining vector + text relevance
+  - Result metadata enrichment
+
+### **Pillar 3: MCP Server Integration (Future) 🚀**
+
+#### `future_mcp_server/mcp_server.py`
+- **Single Responsibility**: Bridge Claude Desktop to FastAPI service
+- **Dependencies**: MCP protocol, HTTP client
+- **State**: Long-running process with connection management
+- **Tools Exposed**:
+  - `search_hormozi_frameworks()`: Framework discovery
+  - `analyze_offer_structure()`: Offer evaluation
+  - `get_framework_by_topic()`: Specific framework retrieval
+  - `compare_offer_strategies()`: Multi-offer analysis
+
+#### Integration Architecture:
+```python
+# MCP Server calls FastAPI endpoints:
+search_frameworks() -> POST /query -> PostgreSQL -> JSON -> MCP Tool Response
+analyze_offer() -> POST /analyze-offer -> Framework Analysis -> Claude Desktop
+```
+
+## Production Service Requirements
+
+### **API Service Layer Specifications:**
+
+#### **Performance Requirements:**
+- **Query Response**: <500ms p95 (including OpenAI embedding)
+- **Health Check**: <50ms response time
+- **Concurrent Requests**: 10+ simultaneous users
+- **Uptime**: 99.9% availability target
+
+#### **Error Handling:**
+- **Database Connection Failures**: Graceful retry with exponential backoff
+- **OpenAI API Failures**: Fallback to cached embeddings or error response  
+- **Malformed Requests**: Validation errors with helpful messages
+- **Rate Limit Exceeded**: 429 status with retry-after header
+
+#### **Monitoring and Logging:**
+- **Request Logging**: Query content, response times, user identification
+- **Error Tracking**: Exception details, stack traces, error frequency
+- **Performance Metrics**: Query latency, database response times, throughput
+- **Business Metrics**: Most requested frameworks, query patterns, user behavior
+
+#### **Security Requirements:**
+- **Input Validation**: SQL injection prevention, schema validation  
+- **Rate Limiting**: Per-IP request throttling
+- **Authentication**: API key based access control (future)
+- **CORS**: Proper cross-origin request handling
 - **Error Handling**: Circuit breaker for external services
 
 #### `hormozi_rag/retrieval/retriever.py`

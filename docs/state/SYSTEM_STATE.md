@@ -126,16 +126,63 @@ DATABASE_URL=postgresql://rag_app_user:rag_secure_password_123@localhost:5432/ho
 - [x] ✅ Complete file cleanup and organization 
 - [x] ✅ Update documentation to reflect current state
 - [x] ✅ Verify system architecture compliance
+- [x] ✅ Plan API Service Layer and MCP integration architecture
 
-### 🚀 **SHORT TERM (THIS WEEK)**  
-- [ ] **Deploy Query API**: Build user interface on PostgreSQL foundation
-- [ ] **Performance Testing**: Load testing with realistic query volumes
-- [ ] **Monitoring Setup**: Query performance and system health tracking
+### 🚀 **PHASE 2: API SERVICE LAYER (THIS WEEK - 6-8 hours)**
+**Objective**: Build FastAPI HTTP interface for PostgreSQL system
 
-### 📈 **MEDIUM TERM (THIS MONTH)**
-- [ ] **Content Scaling**: Add additional frameworks/books  
-- [ ] **Vector Index Optimization**: Resolve indexing for larger datasets
-- [ ] **Multi-User Testing**: Concurrent access validation
+#### **Day 1-2: Core API Implementation** ✅ COMPLETED
+- [x] ✅ Create PostgreSQL storage interface implementing VectorDBInterface
+- [x] ✅ Implement `POST /api/v1/query` endpoint with PostgreSQL vector search
+- [x] ✅ Add comprehensive error handling and input validation (3-level strategy)
+- [x] ✅ Test endpoints against existing PostgreSQL database with critical path testing
+
+**Implementation Status**: FastAPI service layer operational with PostgreSQL integration
+**Errors Found**: 3 (all documented and resolved in INTEGRATION_ISSUES_LOG.md)
+**Performance**: Database 3-5ms, API 300-900ms (within acceptable ranges)
+**Integration Tested**: Storage ↔ Database, API ↔ Storage boundaries validated
+
+#### **Day 2-3: MCP Server Implementation** 🔧 NEXT
+- [ ] Create MCP server process following ARCHITECTURE.md HTTP bridge pattern
+- [ ] Define tool schemas for `search_hormozi_frameworks()` per MCP protocol
+- [ ] Implement HTTP bridge to FastAPI endpoints (no direct database access)
+- [ ] Add error translation for Claude-friendly messages
+- [ ] Test MCP protocol compliance and tool calling
+
+**Next Priority**: MCP server to bridge Claude Desktop → FastAPI → PostgreSQL
+
+#### **Day 5: Integration Validation**
+- [ ] Performance testing: validate <500ms response times
+- [ ] Error scenario testing: database failures, malformed requests
+- [ ] Load testing: concurrent request handling
+- [ ] Documentation: API endpoint specifications
+
+### 🚀 **PHASE 3: MCP SERVER INTEGRATION (NEXT WEEK - 4-6 hours)**
+**Objective**: Claude Desktop integration for seamless user experience
+
+#### **Day 1-2: MCP Server Setup**
+- [ ] Create MCP server process in `future_mcp_server/`
+- [ ] Define tool schemas for `search_hormozi_frameworks()`
+- [ ] Implement HTTP bridge to FastAPI endpoints
+- [ ] Test MCP protocol compliance
+
+#### **Day 3-4: Claude Desktop Integration**
+- [ ] Configure Claude Desktop MCP server connection
+- [ ] Test tool calling from Claude interface
+- [ ] Implement `analyze_offer_structure()` tool
+- [ ] Add error handling for Claude-friendly messages
+
+#### **Day 5: End-to-End Validation**
+- [ ] Test complete flow: Claude → MCP → FastAPI → PostgreSQL
+- [ ] Performance validation under realistic Claude usage
+- [ ] User experience testing with Dan's workflow
+- [ ] Production deployment preparation
+
+### 📈 **FUTURE ENHANCEMENTS (MONTH 2+)**
+- [ ] **Content Scaling**: Add additional Hormozi frameworks/books
+- [ ] **Advanced Tools**: Multi-offer comparison, strategy recommendations  
+- [ ] **Vector Index Optimization**: Performance tuning for larger datasets
+- [ ] **Multi-User Features**: User sessions, personalized recommendations
 
 ---
 

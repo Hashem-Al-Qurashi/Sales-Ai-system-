@@ -118,27 +118,47 @@ ORDER BY rank DESC;
 
 ---
 
-## 📁 **Project Structure**
+## 📁 **Organized Project Structure**
 
 ```
-├── data/                          # Production chunks (20 files)
+├── production/                    # 🔒 PRODUCTION SYSTEM (organized)
+│   ├── api/                      # Core application modules
+│   │   └── hormozi_rag/          # Complete framework (22 modules)
+│   ├── config/                   # Production configuration
+│   │   ├── .env                  # PostgreSQL production settings
+│   │   └── requirements.txt      # Python dependencies  
+│   └── run_api.py               # Production API entry point
+│
+├── data/                          # 📊 PRODUCTION DATA (20 chunks)
 │   └── chunk_001_*.json → chunk_020_*.json
-├── hormozi_rag/                   # Core application modules
-│   ├── api/                       # FastAPI endpoints  
-│   ├── core/                      # Orchestrator, chunker, logger
-│   ├── embeddings/                # OpenAI embedding integration
-│   ├── generation/                # LLM response generation
-│   ├── retrieval/                 # Search and ranking
-│   └── storage/                   # Database interfaces
-├── docs/                          # Architecture & specifications
-│   ├── architecture/              # System design documents
-│   ├── database/                  # PostgreSQL implementation specs
-│   ├── decisions/                 # Technical decision log
-│   └── state/                     # Current system status
-├── scripts/                       # Production utility scripts
-├── backup/                        # Current migration backup (safety)
-└── archive/                       # Historical files (cleaned up)
+│
+├── development/                   # 🔧 DEVELOPMENT WORKSPACE
+│   ├── scripts/                  # Development utilities
+│   └── experiments/              # POCs and testing
+│
+├── migrations/                    # 📦 FUTURE MIGRATIONS (ready)
+│
+├── docs/                          # 📖 ARCHITECTURE & SPECIFICATIONS  
+│   ├── architecture/             # System design documents
+│   ├── database/                 # PostgreSQL implementation specs
+│   ├── decisions/                # Technical decision log
+│   └── state/                    # Current system status
+│
+├── backup/                        # 🛡️ SAFETY SYSTEMS
+│   └── database_migration_20251008_105002/
+│
+├── archive/                       # 📚 HISTORICAL REFERENCE
+│   ├── migration_20251008/       # Migration documentation  
+│   └── old_iterations/           # Previous versions
+│
+└── README.md                      # Project documentation (this file)
 ```
+
+**Organization Benefits:**
+- **🔒 Production Protection**: production/ clearly separated and protected
+- **🔧 Development Clarity**: development/ for active work without production risk
+- **📦 Migration Ready**: migrations/ structured for future changes
+- **🛡️ Safety Maintained**: backup/ and archive/ preserve all historical data
 
 ---
 
