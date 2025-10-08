@@ -142,6 +142,73 @@ def embed_text(text):
 
 ### After Implementation
 
+## 🚨 FILE LIFECYCLE MANAGEMENT (MANDATORY)
+**Added**: 2025-10-08 - Prevent project file chaos
+
+### Before Creating ANY File:
+1. **Categorize** (REQUIRED):
+   ```
+   production/   - Live system files (NEVER delete without backup)
+   development/  - Active work (cleanup weekly)
+   experiments/  - POCs/testing (auto-delete after 30 days)  
+   migrations/   - One-time scripts (archive after completion)
+   ```
+
+2. **Document Purpose** (REQUIRED):
+   ```python
+   """
+   FILE LIFECYCLE: production/development/experiment/migration
+   PURPOSE: [specific problem this solves]
+   REPLACES: [what file this supersedes, if any]
+   CLEANUP_DATE: [when to review/delete, if temporary]
+   """
+   ```
+
+3. **Name Convention** (REQUIRED):
+   ```
+   production/: stable_functional_names.py
+   development/: feature_purpose.py  
+   experiments/: test_idea_YYYYMMDD.py
+   migrations/: migrate_feature_YYYYMMDD.py
+   ```
+
+4. **AI Integration Protocol** (CRITICAL):
+   ```markdown
+   MANDATORY AI INSTRUCTION:
+   Before creating ANY file, AI MUST:
+   1. Check if similar file exists (avoid duplicates)
+   2. Ask which directory category this belongs to
+   3. Document what problem this solves specifically
+   4. Plan cleanup/lifecycle if temporary
+   5. Get explicit approval for production/ files
+   
+   AI must ask: "This creates a [category] file for [purpose]. 
+   Should I proceed?" before any file creation.
+   ```
+
+### Directory Structure Enforcement
+```
+project_root/
+├── production/              # 🔒 PROTECTED - production system
+│   ├── api/                # FastAPI application
+│   ├── data/               # Production chunks  
+│   ├── config/             # .env, requirements.txt
+│   └── run_api.py          # Production entry point
+├── development/            # 🔧 ACTIVE WORK - weekly cleanup
+│   ├── scripts/            # Development utilities
+│   └── experiments/        # POCs and testing
+├── migrations/             # 📦 ONE-TIME - archive after use
+│   └── YYYYMMDD_purpose/   # Dated migration folders
+├── archive/                # 📚 HISTORICAL - safe storage
+└── docs/                   # 📖 ARCHITECTURE - version controlled
+```
+
+### Lifecycle Rules
+- **production/**: Changes require system verification
+- **development/**: Review and cleanup every Friday  
+- **experiments/**: Auto-review after 30 days
+- **migrations/**: Archive immediately after successful completion
+
 #### Integration Verification
 ```python
 # Run these checks:

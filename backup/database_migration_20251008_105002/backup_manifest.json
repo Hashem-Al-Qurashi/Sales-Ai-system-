@@ -1,0 +1,24 @@
+{
+  "backup_timestamp": "20251008_105002",
+  "backup_type": "comprehensive_database_migration",
+  "source_database": "/home/sakr_quraish/Projects/Danial Rag/data/hormozi_rag.db",
+  "backup_directory": "/home/sakr_quraish/Projects/Danial Rag/backup/database_migration_20251008_105002",
+  "contents": {
+    "database_file": "hormozi_rag_backup.db",
+    "documents_json": "framework_documents.json",
+    "metadata_json": "framework_metadata.json",
+    "embeddings_json": "chunk_embeddings.json",
+    "concepts_json": "key_concepts.json",
+    "relationships_json": "document_concepts.json",
+    "schema_sql": "database_schema.sql",
+    "original_chunks": "original_chunks/"
+  },
+  "statistics": {
+    "documents": 20,
+    "metadata_records": 20,
+    "embeddings": 20,
+    "concepts": 42,
+    "relationships": 42,
+    "original_chunk_files": 20
+  }
+}

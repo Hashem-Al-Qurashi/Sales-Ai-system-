@@ -37,8 +37,8 @@ This document is the **single source of truth** for system architecture. Any cod
                │
 ┌──────────────▼──────────────────────────────────────────────┐
 │                    STORAGE LAYER                             │
-│  ├── VectorDB (Chroma/Pinecone)                             │
-│  ├── Document Store (PostgreSQL/SQLite)                     │
+│  ├── PostgreSQL + pgvector (Vector + Document unified)      │
+│  ├── Alternative: Chroma/Pinecone (Vector) + PostgreSQL     │
 │  └── Cache Layer (Redis/In-Memory)                          │
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -99,15 +99,22 @@ User Query → Validation → Embedding → Retrieval → Reranking → Generati
 # Single source of configuration truth
 class Settings:
     # Environment variables override defaults
-    VECTOR_DB_TYPE: str = env("VECTOR_DB_TYPE", "chroma")
+    VECTOR_DB_TYPE: str = env("VECTOR_DB_TYPE", "postgresql")
     EMBEDDING_MODEL: str = env("EMBEDDING_MODEL", "openai")
     CHUNK_SIZE: int = env("CHUNK_SIZE", 1000)
     CHUNK_OVERLAP: int = env("CHUNK_OVERLAP", 200)
     
+    # PostgreSQL Configuration
+    POSTGRES_HOST: str = env("POSTGRES_HOST", "localhost")
+    POSTGRES_PORT: int = env("POSTGRES_PORT", 5432)
+    POSTGRES_DB: str = env("POSTGRES_DB", "hormozi_rag")
+    POSTGRES_USER: str = env("POSTGRES_USER", "rag_user")
+    POSTGRES_PASSWORD: str = env("POSTGRES_PASSWORD", required=True)
+    
     # Runtime validation
     def validate(self):
         assert self.CHUNK_OVERLAP < self.CHUNK_SIZE
-        assert self.VECTOR_DB_TYPE in ["chroma", "pinecone", "weaviate"]
+        assert self.VECTOR_DB_TYPE in ["postgresql", "chroma", "pinecone", "weaviate"]
 ```
 
 ## State Management Rules
@@ -178,10 +185,15 @@ class Settings:
 ## Extension Points
 
 ### Adding New Vector Database
+**Primary**: PostgreSQL + pgvector (unified vector + document storage)
+**Alternatives**: External vector databases for specialized use cases
+
 1. Implement `VectorDBInterface` in `hormozi_rag/storage/interfaces.py`
 2. Register in `hormozi_rag/storage/factory.py`
 3. Add configuration in `settings.py`
 4. Update validation in health checks
+
+**PostgreSQL Implementation**: `hormozi_rag/storage/postgresql_storage.py`
 
 ### Adding New LLM Provider
 1. Implement `LLMInterface` in `hormozi_rag/generation/interfaces.py`

@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-10-06",
+  "system_type": "SQLite + Mock Embeddings",
+  "validation_results": {
+    "schema": "PASS - All tables present with proper structure",
+    "data_integrity": "PASS - 20 docs, 20 embeddings, 42 concepts",
+    "embeddings": "FAIL - Exception: no such column: embedding_dimensions",
+    "search": "PASS - Search working: {'value equation': 2, 'bonuses': 5, 'scarcity': 4, 'offer': 11}",
+    "framework_integrity": "PASS - 4 core frameworks found with integrity",
+    "environment": "PASS - All required variables configured"
+  },
+  "overall_status": "FAIL"
+}

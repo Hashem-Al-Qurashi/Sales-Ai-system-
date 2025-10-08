@@ -70,28 +70,40 @@ This log records all significant architectural decisions made during development
 
 ---
 
-### PENDING - Vector Database Selection
-**Status**: Proposed
-**Context**: Need to choose between Chroma, Pinecone, and Weaviate for vector storage.
+### 2025-10-06 - PostgreSQL + pgvector Unified Storage Decision
+**Status**: Accepted
+**Context**: Need to choose vector storage solution that eliminates complexity of separate VectorDB + Document Store while maintaining production scalability.
 
-**Decision**: [To be made]
+**Decision**: Implement PostgreSQL + pgvector as unified vector and document storage solution
 
-**Evaluation Criteria**:
-1. **Chroma**
-   - Pros: Local development, no API costs, fast iteration
-   - Cons: Not production-scale, limited features
-   
-2. **Pinecone**
-   - Pros: Production-ready, managed service, good performance
-   - Cons: Costs, vendor lock-in, network latency
-   
-3. **Weaviate**
-   - Pros: Self-hosted option, rich features, good performance
-   - Cons: Operational overhead, complexity
+**Reasoning**:
+1. **Architectural Simplification**: Single database eliminates sync issues between vector and document stores
+2. **Production Ready**: PostgreSQL is enterprise-grade with proven operational characteristics
+3. **Cost Efficiency**: No additional vector database licensing or API costs
+4. **Framework Preservation**: Native SQL ensures complete business framework integrity
+5. **Developer Experience**: Standard SQL interface, familiar tooling, established backup/recovery
 
-**Recommendation**: Start with Chroma for development, abstract interface to allow Pinecone for production
+**Technical Benefits**:
+- Sub-500ms vector search performance with proper indexing
+- ACID compliance for data integrity
+- Rich metadata queries with standard SQL
+- Simplified backup and disaster recovery
+- Horizontal scaling capabilities
 
-**Review Date**: After POC completion
+**Consequences**:
+- **Pros**: Unified storage, reduced operational complexity, cost-effective, SQL-native
+- **Cons**: Requires PostgreSQL + pgvector setup, less specialized than dedicated vector DBs
+- **Migration**: Requires implementation of PostgreSQL storage interface
+
+**Alternatives Considered**:
+1. **Chroma + PostgreSQL** - Rejected: Dual database complexity, sync issues
+2. **Pinecone + PostgreSQL** - Rejected: Vendor lock-in, API costs, latency
+3. **Weaviate + PostgreSQL** - Rejected: Operational overhead, complexity
+
+**Implementation**: PostgreSQL + pgvector with VectorDBInterface compliance
+**Performance Target**: <500ms p95 vector search, 100K+ chunk scalability
+
+**Review Date**: 2025-11-06 (after production deployment)
 
 ---
 
@@ -262,7 +274,7 @@ Track decisions that intentionally create debt:
 
 | Date | Decision | Debt Created | Payback Plan | Due Date |
 |------|----------|--------------|--------------|----------|
-| TBD | Use SQLite for MVP | No production DB | Migrate to PostgreSQL | Before launch |
+| 2025-10-06 | Use JSON files for MVP | No production DB | ✅ Migrate to PostgreSQL + pgvector | In Progress |
 | TBD | Skip authentication | No user management | Add auth layer | Before beta |
 | TBD | Hardcode prompts | No prompt versioning | Create prompt management | Month 2 |
 

@@ -1,0 +1,53 @@
+{
+  "chunk_id": "business_foundation_commoditization_004",
+  "section": "Section II: Pricing",
+  "chapter": "Chapter 3: The Commodity Problem",
+  "chunk_type": "atomic_framework",
+  "framework_name": "growth_foundation_and_commoditization",
+  "text": "\"Think different.\"\nSTEVE JOBS\n\n\"Grow or Die\" is a core tenet at our companies. We believe every person, every company, and every organism is either growing or dying. Maintenance is a myth.\n\nWhat this means is, if your company isn't growing, it's dying. This is a sobering reality for many of us. I learned the hard way, and my businesses suffered for a long time because of it.\n\nLet me explain. The market is continuously growing. The stock market grows at 9 percent per year. If we aren't growing at 9 percent per year, we are falling behind. \"Maintenance,\" in the most generic sense, would be 9 percent growth year over year. Furthermore, if you're in a growing marketplace, then you might have to grow at 20-30 percent per year, just to keep up, or risk falling behind. So you can see how maintenance is a myth.\n\nSo, then, what does it take to grow? Thankfully, just three simple things:\n1. Get more customers\n2. Increase their average purchase value\n3. Get them to buy more times\n\nThat's it.\n\nSure, there are lots of ways to acquire customers and zillions of ways to increase order value and purchase frequency, but, simply put, that's it. Those are the only three ways to grow.\n\nExample: If I sell 10 clients a month, and a client is worth $1,000 to me over their lifetime (through avg cart value x avg number of purchases), then my business will cap at $10,000/mo (10 x $1,000).\n\n10 New Clients/mo x $1000 Lifetime Value = $10,000/mo max revenue.\n\nIf you want to grow, you've got to either sell more clients every month (while maintaining suitable margins) or have them be worth more (by increasing the profit per purchase or number of times they buy). That's it.\n\nAuthor Note - Only Two Ways to Grow\nTo simplify this concept even more. There are really only two ways to grow: get more customers, and increase each customer's value. \"Increasing each customer's value\" has two sub-buckets: 1) Increasing profit per purchase 2) Increasing the number of times they buy. For the purpose of this book, I highlight both of those sub-buckets as individual growth paths. I did this because I think it will be easier to understand the money models that will come in Volume III. All three — getting more customers, increasing their average purchase value, and getting them to buy more — are repeated themes in this book. But if you seek simplicity, both increasing average purchase value and increasing the number of times a customer buys results in one outcome: increasing each customer's value.\n\nBusiness Terms\n\nBefore going any further, and to better flesh out the concepts that follow, we should take a second to define and better understand some key business concepts. When I stood in that Las Vegas penthouse in my \"beast mode\" t-shirt I was clueless about such terms. Let me help you be better than, well, me.\n\nGross Profit: The revenue minus the direct cost of servicing an ADDITIONAL customer. If I sell lotion for $10 and it costs me $2, my gross profit is $8 or 80 percent. If I sell agency services for $1,000/mo and it costs me $100/mo in labor to run that client's advertising, then my gross profit is $900 or 90 percent. Note: This is not net profit. Net profit is what's left over after all expenses are paid, not just the direct costs of fulfillment.\n\nLifetime Value: The gross profit accrued over the entire lifetime of a customer. This is gross profit multiplied by the number of purchases an average customer will make over their lifetime. Using the example above, if the average customer stays five months, and they pay $1,000/mo while it costs me $100 per month to fulfill, then their lifetime value is $4,500.\n\nHere's the breakdown:\nRevenue: ($1,000/mo * 90% Gross Margin * 5 months) = $4,500 Lifetime Value (LTV)\n\nNote that the indirect costs, like admin, software, rent, etc., are not included in LTV.\n\nNote: You will find different definitions for lifetime value depending on the source. The biggest difference is that some sources only count total revenue, while others focus on gross profit over the lifespan. I focus on gross profit. You may also see me refer to this as LTGP Lifetime Gross Profit in other texts for clarity's sake.\n\nValue-Driven vs. Price-Driven Purchases\n\nThis book was intended to be a textbook for any business that wants to grow. I've spent (and continue to spend) hundreds of hours on calls and in-person meetings consulting entrepreneurs on crafting their offers. I have seen the ones that take off into the stratosphere and those that fizzle.\n\nHaving a Grand Slam offer makes it almost impossible to lose. But why? What gives it such an impact? In short, having a Grand Slam Offer helps with all three of the requirements for growth: getting more customers, getting them to pay more, and getting them to do so more times.\n\nHow? It allows you to differentiate yourself from the marketplace. In other words, it allows you to sell your product based on VALUE not on PRICE.\n\nCommoditized = Price Driven Purchases (race to the bottom)\nDifferentiated = Value Driven Purchases (sell in a category of one with no comparison. Yes, market matters, which I will expound on in the next chapter)\n\nA commodity, as I define it, is a product available from many places. For that reason, it's prone to purchases based on \"price\" instead of \"value.\" If all products are \"equal,\" then the cheapest one is the most valuable by default. In other words, if a prospect compares your product to another and thinks \"these are pretty much the same, I'll buy the cheaper one,\" then they commoditized you. How embarrassing! But really . . . it's one of the worst experiences a value-driven entrepreneur can have.\n\nThis is a massive problem for the entrepreneur because commodities are valued at the point of market efficiency. This means that the marketplace drives the price down through competition until the margins are just enough to keep the lights on: \"just enough\" to become a slave to their business. The business makes \"just enough\" to justify the owner waiting anxiously for things to \"turn around,\" and by the time that lie is realized . . . they are in too deep to pivot (at least, until now).\n\nA Grand Slam Offer solves this problem.",
+  "char_count": 5958,
+  "word_count": 1016,
+  "preserves_complete_concept": true,
+  "contains_formula": true,
+  "contains_list": true,
+  "business_logic_intact": true,
+  "validation_passed": true,
+  "key_frameworks": [
+    "grow_or_die_philosophy",
+    "three_ways_to_grow",
+    "gross_profit_definition",
+    "lifetime_value_calculation",
+    "commoditization_problem"
+  ],
+  "semantic_tags": [
+    "growth_strategy",
+    "maintenance_myth",
+    "9_percent_growth",
+    "ltv_calculation",
+    "gross_profit",
+    "commoditization",
+    "value_vs_price",
+    "market_efficiency",
+    "differentiation"
+  ],
+  "retrieval_optimization": {
+    "primary_search_terms": [
+      "grow or die",
+      "three ways to grow",
+      "lifetime value",
+      "LTV calculation",
+      "gross profit",
+      "commoditization problem",
+      "value driven vs price driven",
+      "Grand Slam Offer impact"
+    ],
+    "framework_type": "foundational_business_concepts",
+    "problem_addressed": "business_stagnation_and_commoditization",
+    "key_formulas": {
+      "ltv_calculation": "($1,000/mo * 90% Gross Margin * 5 months) = $4,500",
+      "revenue_cap": "10 New Clients/mo x $1000 Lifetime Value = $10,000/mo"
+    }
+  },
+  "overlap_with_previous": "I say this because I honestly can't believe it. All of this was because of a girl who believed in me, a credit card, and a Grand Slam Offer.",
+  "overlap_with_next": null
+}

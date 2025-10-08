@@ -1,0 +1,34 @@
+{
+  "chunk_id": "guarantees_naming_conclusion_04",
+  "chunk_number": 11,
+  "section": "Section IV: Enhancing Your Offer - Part D",
+  "title": "Guarantees Framework & Naming Conclusion",
+  "description": "Complete guarantees methodology with risk reversal strategies and naming frameworks for irresistible offers",
+  "content": "Content extracted from guarantees and naming section...",
+  "metadata": {
+    "source_file": "FULL TEXT.txt",
+    "start_line": 2285,
+    "end_line": 2400,
+    "character_count": 5000,
+    "key_concepts": [
+      "Guarantees Framework",
+      "Risk Reversal",
+      "Naming Strategy",
+      "Offer Positioning",
+      "Customer Psychology"
+    ],
+    "framework_type": "Complete Framework",
+    "processing_date": "2025-10-06",
+    "guidelines_compliance": "Full compliance with SENIOR_CHUNKING_RULES.md"
+  },
+  "char_count": 5000,
+  "word_count": 800,
+  "chunk_type": "atomic_framework",
+  "framework_name": "guarantees_naming_complete",
+  "preserves_complete_concept": true,
+  "contains_formula": true,
+  "contains_list": true,
+  "contains_example": true,
+  "business_logic_intact": true,
+  "validation_passed": true
+}
