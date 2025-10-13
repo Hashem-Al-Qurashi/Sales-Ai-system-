@@ -1,0 +1,41 @@
+{
+  "test_execution_report": {
+    "test_execution_id": "mcp_real_system_1759951296",
+    "component": "MCP Server Real System Integration",
+    "date": "2025-10-08T19:21:36.890353",
+    "test_type": "Real System Integration - No Mocked Components",
+    "status": "PASS"
+  },
+  "test_results": {
+    "test_execution_id": "mcp_real_system_1759951296",
+    "timestamp": "2025-10-08T19:21:36.890353",
+    "test_type": "Real System Integration",
+    "results": {
+      "dans_primary_use_case": "PASS",
+      "pricing_strategy": "PASS",
+      "guarantee_frameworks": "PASS",
+      "performance_validation": "PASS",
+      "error_handling": "PASS",
+      "overall": "PASS"
+    },
+    "errors_found": [],
+    "performance_metrics": {
+      "average_query_time_ms": 334.76734161376953,
+      "max_query_time_ms": 398.0562686920166,
+      "queries_tested": 4,
+      "performance_acceptable": true
+    }
+  },
+  "system_validation": {
+    "fastapi_server": "REQUIRED - localhost:8000",
+    "postgresql_database": "REQUIRED - hormozi_rag with 20 chunks",
+    "openai_api": "REQUIRED - text-embedding-3-large",
+    "mocked_components": "NONE - all real system testing"
+  },
+  "business_value_validation": {
+    "dans_workflow": "Framework search for offer creation",
+    "semantic_quality": "Relevant frameworks returned for business questions",
+    "performance": "Acceptable for real-time Claude Desktop usage",
+    "error_handling": "User-friendly messages for Claude interface"
+  }
+}
